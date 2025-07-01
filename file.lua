@@ -60,6 +60,8 @@ ScrollingFrame.Size = UDim2.new(1, 0, 0.800000012, 0)
 
 UIListLayout.Parent = ScrollingFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly
 UIListLayout.Padding = UDim.new(0, 5)
 
 line.Name = "line"
@@ -102,7 +104,8 @@ UICorner_3.Parent = StealButton
 UIListLayout_2.Parent = line
 UIListLayout_2.FillDirection = Enum.FillDirection.Horizontal
 UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout_2.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_2.HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly
 UIListLayout_2.Padding = UDim.new(0, 5)
 
 GoTo.Name = "GoTo"
@@ -158,8 +161,11 @@ end
 local proximityprompt_service = game:GetService("ProximityPromptService")
 local local_player = game:GetService("Players").LocalPlayer
 local workspace = game:GetService("Workspace")
-
 local RunService = game:GetService("RunService")
+local PlaceId = game.PlaceId
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local mouse = local_player:GetMouse()
 
 local Noclipping = nil
 StealButton.Text = "noclip"
@@ -317,6 +323,52 @@ for _, v in ipairs(standPets:GetDescendants()) do
 		end
 	end
 end
+
+TextLabel:Destroy()
+StealButton.Size = UDim2.new(0.2, 0, 1, 0)
+GoTo.Size = UDim2.new(0.2, 0, 1, 0)
+local newbutton1 = StealButton:Clone()
+newbutton1.Parent = StealButton.Parent
+local newbutton2 = StealButton:Clone()
+newbutton2.Parent = StealButton.Parent
+
+newbutton1.Text = "s/hop"
+newbutton1.Activated:Connect(function()
+	-- thanks to Amity for fixing
+	local servers = {}
+	local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+	local body = HttpService:JSONDecode(req)
+
+	if body and body.data then
+		for i, v in next, body.data do
+			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+				table.insert(servers, 1, v.id)
+			end
+		end
+	end
+
+	if #servers > 0 then
+		TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], local_player)
+	else
+		warn("couldn't find server")
+	end
+end)
+
+newbutton2.Text = "tpTool"
+newbutton2.Activated:Connect(function()
+	local TpTool = Instance.new("Tool")
+	TpTool.Name = "Teleport Tool"
+	TpTool.RequiresHandle = false
+	TpTool.Parent = local_player.Backpack
+	TpTool.Activated:Connect(function()
+		local Char = local_player.Character or workspace:FindFirstChild(local_player.Name)
+		local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
+		if not Char or not HRP then
+			return warn("Failed to find HumanoidRootPart")
+		end
+		HRP.CFrame = CFrame.new(mouse.Hit.X, mouse.Hit.Y + 3, mouse.Hit.Z, select(4, HRP.CFrame:components()))
+	end)
+end)
 
 queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
 
