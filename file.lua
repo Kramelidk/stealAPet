@@ -155,6 +155,8 @@ coroutine.wrap(GRZK_fake_script)()
 
 ---------
 
+--StealButton.Activated:Connect()
+
 
 
 if not game:IsLoaded() then
@@ -265,9 +267,6 @@ for _, v in ipairs(standPets:GetDescendants()) do
 			HugeHellRockCount += 1
 			HugeCount += 1
 		end
-		if meshId == SecretMeshId then
-			stealPet("Secret Pet", main)
-		end
 		if meshId == HugePrototypeMeshId then
 			stealPet("Huge M-6 PROTOTYPE", main)
 		end
@@ -275,6 +274,15 @@ for _, v in ipairs(standPets:GetDescendants()) do
 			stealPet("Huge Pufferfish", main)
 			HugePufferfishCount += 1
 			HugeCount += 1
+		end
+		if main:FindFirstChild("Lid") then
+			stealPet("Toilet Cat", main)
+		end
+		if main.ClassName == "MeshPart" then
+			stealPet("Egg maybe", main)
+		end
+		if main:FindFirstChild("center"):FindFirstChild("Charge") then
+			stealPet("Corn/Hubert", main)
 		end
 	end
 end
