@@ -57,12 +57,13 @@ ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 ScrollingFrame.BorderSizePixel = 0
 ScrollingFrame.Position = UDim2.new(0, 0, 0.200000003, 0)
 ScrollingFrame.Size = UDim2.new(1, 0, 0.800000012, 0)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 3, 0)
 
 UIListLayout.Parent = ScrollingFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout.HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly
-UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Padding = UDim.new(0, 10)
 
 line.Name = "line"
 line.Parent = ScrollingFrame
@@ -70,7 +71,7 @@ line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 line.BackgroundTransparency = 1.000
 line.BorderColor3 = Color3.fromRGB(0, 0, 0)
 line.BorderSizePixel = 0
-line.Size = UDim2.new(1, 0, 0.0500000007, 0)
+line.Size = UDim2.new(1, 0, 0.025, 0)
 
 TextLabel.Parent = line
 TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -166,6 +167,7 @@ local PlaceId = game.PlaceId
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local mouse = local_player:GetMouse()
+local Players = game:GetService("Players")
 
 local Noclipping = nil
 StealButton.Text = "noclip"
@@ -246,9 +248,24 @@ proximityprompt_service.PromptButtonHoldEnded:Connect(function()
 	local_player.Character:MoveTo(plot:FindFirstChild("CollectPart"):GetPivot().Position)
 end)
 
+line.Visible = false
+
+local newLine = line:Clone()
+newLine.Visible = true
+newLine.Parent = line.Parent
+newLine.TextLabel:Destroy()
+newLine.StealButton.Size = UDim2.new(0.2, 0, 1, 0)
+newLine.GoTo.Size = UDim2.new(0.2, 0, 1, 0)
+local newbutton1 = newLine.StealButton:Clone()
+newbutton1.Parent = newLine.StealButton.Parent
+local newbutton2 = newLine.StealButton:Clone()
+newbutton2.Parent = newLine.StealButton.Parent
+
 local stealing = false
 local function stealPet(pet, part)
 	local newHuge = line:Clone()
+	newHuge.Visible = true
+	newHuge.Name = "PetLine"
 	newHuge.Parent = line.Parent
 	newHuge.TextLabel.Text = pet
 	newHuge.StealButton.Text = "Steal"
@@ -300,47 +317,58 @@ local function stealPet(pet, part)
 		end
 	end)
 end
-
-for _, v in ipairs(standPets:GetDescendants()) do
-	local main = v:FindFirstChild("Main")
-	if main and main:FindFirstChild("ParticleEmitter") then
-		stealPet("Egg maybe", main)
+local function loadPets()
+	
+	for _, v in ipairs(Frame:GetDescendants()) do
+		if v.Name == "PetLine" and v:IsA("Frame") then
+			v:Destroy()
+		end
 	end
-	if main and main:FindFirstChild("Mesh") then
-		petCount += 1
-		local meshId = main:FindFirstChild("Mesh").MeshId
-		if meshId == HugeHellRockMeshId then
-			stealPet("Huge Hell Rock", main)
-			HugeHellRockCount += 1
-			HugeCount += 1
+	
+	for _, v in ipairs(standPets:GetDescendants()) do
+		local main = v:FindFirstChild("Main")
+		if main and main:FindFirstChild("ParticleEmitter") then
+			stealPet("Egg maybe", main)
 		end
-		if meshId == HugePrototypeMeshId then
-			stealPet("Huge M-6 PROTOTYPE", main)
-		end
-		if meshId == HippomelonMeshId then
-			stealPet("Hippomelon", main)
-		end
-		if meshId == HugePufferfishMeshId then
-			stealPet("Huge Pufferfish", main)
-			HugePufferfishCount += 1
-			HugeCount += 1
-		end
-		if main:FindFirstChild("Lid") then
-			stealPet("Toilet Cat", main)
-		end
-		if main:FindFirstChild("center"):FindFirstChild("Charge") then
-			stealPet("Corn/Hubert", main)
+		if main and main:FindFirstChild("Mesh") then
+			petCount += 1
+			local meshId = main:FindFirstChild("Mesh").MeshId
+			if meshId == HugeHellRockMeshId then
+				stealPet("Huge Hell Rock", main)
+				HugeHellRockCount += 1
+				HugeCount += 1
+			end
+			if meshId == HugePrototypeMeshId then
+				stealPet("Huge M-6 PROTOTYPE", main)
+			end
+			if meshId == HippomelonMeshId then
+				stealPet("Hippomelon", main)
+			end
+			if meshId == HugePufferfishMeshId then
+				stealPet("Huge Pufferfish", main)
+				HugePufferfishCount += 1
+				HugeCount += 1
+			end
+			if main:FindFirstChild("Lid") then
+				stealPet("Toilet Cat", main)
+			end
+			if main:FindFirstChild("center"):FindFirstChild("Charge") then
+				stealPet("Corn/Hubert", main)
+			end
 		end
 	end
 end
 
-TextLabel:Destroy()
-StealButton.Size = UDim2.new(0.2, 0, 1, 0)
-GoTo.Size = UDim2.new(0.2, 0, 1, 0)
-local newbutton1 = StealButton:Clone()
-newbutton1.Parent = StealButton.Parent
-local newbutton2 = StealButton:Clone()
-newbutton2.Parent = StealButton.Parent
+loadPets()
+
+Players.PlayerAdded:Connect(function()
+	print("reload")
+	loadPets()
+end)
+Players.PlayerRemoving:Connect(function()
+	print("reload")
+	loadPets()
+end)
 
 newbutton1.Text = "s/hop"
 newbutton1.Activated:Connect(function()
