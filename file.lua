@@ -237,6 +237,7 @@ local function stealPet(pet, part)
 	local newHuge = line:Clone()
 	newHuge.Parent = line.Parent
 	newHuge.TextLabel.Text = pet
+	newHuge.StealButton.Text = "Steal"
 	newHuge.StealButton.Activated:Connect(function()
 
 		local_player.Character.HumanoidRootPart.CFrame = part.CFrame
