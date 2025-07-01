@@ -191,6 +191,8 @@ local SecretCount = 0
 local HugePufferfishMeshId = "rbxassetid://13811398935"
 local HugePufferfishCount = 0
 
+local HugePrototypeMeshId = "rbxassetid://7487208023"
+
 local HugeCount = 0
 
 local stealing = false
@@ -229,8 +231,9 @@ local function stealPet(pet, part)
 				fireproximityprompt(prompt)
 				fireproximityprompt(prompt)
 				task.wait()
-				local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("CollectPart").CFrame
-				--local_player.Character:MoveTo(plot:FindFirstChild("CollectPart"):GetPivot().Position)
+				local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("CollectPart").CFrame * CFrame.new(0,2,0)
+				task.wait()
+				local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
 				break
 			end
 		end
@@ -263,7 +266,10 @@ for _, v in ipairs(standPets:GetDescendants()) do
 			HugeCount += 1
 		end
 		if meshId == SecretMeshId then
-			SecretCount += 1
+			stealPet("Secret Pet", main)
+		end
+		if meshId == HugePrototypeMeshId then
+			stealPet("Huge M-6 PROTOTYPE", main)
 		end
 		if meshId == HugePufferfishMeshId then
 			stealPet("Huge Pufferfish", main)
