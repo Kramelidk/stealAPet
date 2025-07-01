@@ -233,33 +233,45 @@ for _, v in plots:GetDescendants() do
 	end
 end
 
+local stealing = false
 local function stealPet(pet, part)
 	local newHuge = line:Clone()
 	newHuge.Parent = line.Parent
 	newHuge.TextLabel.Text = pet
 	newHuge.StealButton.Text = "Steal"
 	newHuge.StealButton.Activated:Connect(function()
-
 		local_player.Character.HumanoidRootPart.CFrame = part.CFrame
-		while true do
-			task.wait()
-			local_player.Character.HumanoidRootPart.CFrame = part.CFrame
-			if part.Parent:FindFirstChild("RootPart"):FindFirstChild("ProximityPrompt").Enabled == true then
-				local prompt = part.Parent:FindFirstChild("RootPart"):FindFirstChild("ProximityPrompt")
-				local_player.Character.HumanoidRootPart.CFrame = part.CFrame
-				prompt.HoldDuration = 0
-				fireproximityprompt(prompt)
-				fireproximityprompt(prompt)
-				fireproximityprompt(prompt)
-				task.wait()
-				local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("CollectPart").CFrame * CFrame.new(0,2,0)
-				task.wait()
-				local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
-				break
-			end
+
+		if stealing then
+			stealing = false
+			newHuge.StealButton.Text = "Steal"
+			return
 		end
 
+		stealing = true
+		newHuge.StealButton.Text = "Stop"
+
+		repeat
+			task.wait()
+			local_player.Character.HumanoidRootPart.CFrame = part.CFrame
+		until part.Parent:FindFirstChild("RootPart"):FindFirstChild("ProximityPrompt").Enabled or not stealing
+
+		if stealing then
+			local prompt = part.Parent:FindFirstChild("RootPart"):FindFirstChild("ProximityPrompt")
+			local_player.Character.HumanoidRootPart.CFrame = part.CFrame
+			prompt.HoldDuration = 0
+			fireproximityprompt(prompt)
+			fireproximityprompt(prompt)
+			fireproximityprompt(prompt)
+			task.wait()
+			local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("CollectPart").CFrame * CFrame.new(0,2,0)
+			task.wait()
+			local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
+			stealing = false
+			newHuge.StealButton.Text = "Steal"
+		end
 	end)
+
 	newHuge.GoTo.Text = "ESP"
 	newHuge.GoTo.Activated:Connect(function()
 		if newHuge.GoTo.Text == "ESP" then
