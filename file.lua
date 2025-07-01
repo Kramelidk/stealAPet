@@ -210,14 +210,12 @@ local petCount = 0
 
 local HugeHellRockMeshId = "rbxassetid://6538992209"
 local HugeHellRockCount = 0
-
 local SecretMeshId = "rbxassetid://2884752886"
 local SecretCount = 0
-
 local HugePufferfishMeshId = "rbxassetid://13811398935"
 local HugePufferfishCount = 0
-
 local HugePrototypeMeshId = "rbxassetid://7487208023"
+local HippomelonMeshId = 'rbxassetid://7102446118'
 
 local HugeCount = 0
 
@@ -318,6 +316,9 @@ for _, v in ipairs(standPets:GetDescendants()) do
 		end
 		if meshId == HugePrototypeMeshId then
 			stealPet("Huge M-6 PROTOTYPE", main)
+		end
+		if meshId == HippomelonMeshId then
+			stealPet("Hippomelon", main)
 		end
 		if meshId == HugePufferfishMeshId then
 			stealPet("Huge Pufferfish", main)
