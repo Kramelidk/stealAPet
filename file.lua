@@ -305,6 +305,9 @@ end
 
 for _, v in ipairs(standPets:GetDescendants()) do
 	local main = v:FindFirstChild("Main")
+	if main and main:FindFirstChild("ParticleEmitter") then
+		stealPet("Egg maybe", main)
+	end
 	if main and main:FindFirstChild("Mesh") then
 		petCount += 1
 		local meshId = main:FindFirstChild("Mesh").MeshId
@@ -323,9 +326,6 @@ for _, v in ipairs(standPets:GetDescendants()) do
 		end
 		if main:FindFirstChild("Lid") then
 			stealPet("Toilet Cat", main)
-		end
-		if main.ClassName == "MeshPart" then
-			stealPet("Egg maybe", main)
 		end
 		if main:FindFirstChild("center"):FindFirstChild("Charge") then
 			stealPet("Corn/Hubert", main)
