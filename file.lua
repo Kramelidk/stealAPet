@@ -155,10 +155,6 @@ coroutine.wrap(GRZK_fake_script)()
 
 ---------
 
---StealButton.Activated:Connect()
-
-
-
 if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
@@ -166,6 +162,32 @@ end
 local proximityprompt_service = game:GetService("ProximityPromptService")
 local local_player = game:GetService("Players").LocalPlayer
 local workspace = game:GetService("Workspace")
+
+local RunService = game:GetService("RunService")
+
+local Noclipping = nil
+StealButton.Text = "noclip"
+StealButton.Activated:Connect(function()
+	local Clip = false
+	wait(0.1)
+	local function NoclipLoop()
+		if Clip == false and local_player.Character ~= nil then
+			for _, child in pairs(local_player.Character:GetDescendants()) do
+				if child:IsA("BasePart") and child.CanCollide == true then
+					child.CanCollide = false
+				end
+			end
+		end
+	end
+	Noclipping = RunService.Stepped:Connect(NoclipLoop)
+end)
+
+TextLabel.Text = "Template"
+
+GoTo.Text = "walkspeed 100"
+GoTo.Activated:Connect(function()
+	local_player.Character.Humanoid.WalkSpeed = 100
+end)
 
 local things_folder = workspace:FindFirstChild("__THINGS")
 
