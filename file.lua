@@ -239,6 +239,15 @@ for _, v in plots:GetDescendants() do
 	end
 end
 
+proximityprompt_service.PromptButtonHoldBegan:Connect(function(v)
+	v.HoldDuration = 0
+end)
+
+proximityprompt_service.PromptButtonHoldEnded:Connect(function()
+	task.wait()
+	local_player.Character:MoveTo(plot:FindFirstChild("CollectPart"):GetPivot().Position)
+end)
+
 local stealing = false
 local function stealPet(pet, part)
 	local newHuge = line:Clone()
@@ -354,20 +363,9 @@ newbutton1.Activated:Connect(function()
 	end
 end)
 
-newbutton2.Text = "tpTool"
+newbutton2.Text = "LockBase"
 newbutton2.Activated:Connect(function()
-	local TpTool = Instance.new("Tool")
-	TpTool.Name = "Teleport Tool"
-	TpTool.RequiresHandle = false
-	TpTool.Parent = local_player.Backpack
-	TpTool.Activated:Connect(function()
-		local Char = local_player.Character or workspace:FindFirstChild(local_player.Name)
-		local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
-		if not Char or not HRP then
-			return warn("Failed to find HumanoidRootPart")
-		end
-		HRP.CFrame = CFrame.new(mouse.Hit.X, mouse.Hit.Y + 3, mouse.Hit.Z, select(4, HRP.CFrame:components()))
-	end)
+	local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
 end)
 
 queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
