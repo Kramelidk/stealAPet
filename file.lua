@@ -1,8 +1,3 @@
--- Gui to Lua
--- Version: 3.2
-
--- Instances:
-
 local menu = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local close = Instance.new("TextButton")
@@ -65,6 +60,7 @@ ScrollingFrame.Size = UDim2.new(1, 0, 0.800000012, 0)
 
 UIListLayout.Parent = ScrollingFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
 
 line.Name = "line"
 line.Parent = ScrollingFrame
