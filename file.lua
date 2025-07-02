@@ -287,23 +287,90 @@ end)
 
 local stealing = false
 local function stealPet(pet, part)
-	local newHuge = line:Clone()
-	newHuge.Visible = true
-	newHuge.Name = "PetLine"
-	newHuge.Parent = line.Parent
-	newHuge.TextLabel.Text = pet
-	newHuge.StealButton.Text = "Steal"
-	newHuge.StealButton.Activated:Connect(function()
+	local line = Instance.new("Frame")
+	local TextLabel = Instance.new("TextLabel")
+	local StealButton = Instance.new("TextButton")
+	local UICorner_3 = Instance.new("UICorner")
+	local UIListLayout_2 = Instance.new("UIListLayout")
+	local GoTo = Instance.new("TextButton")
+	local UICorner_4 = Instance.new("UICorner")
+
+	line.Name = "PetLine"
+	line.Parent = ScrollingFrame
+	line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	line.BackgroundTransparency = 1.000
+	line.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	line.BorderSizePixel = 0
+	line.Size = UDim2.new(1, 0, 0.025, 0)
+
+	TextLabel.Parent = line
+	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	TextLabel.BackgroundTransparency = 1.000
+	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Size = UDim2.new(0.400000006, 0, 1, 0)
+	TextLabel.Font = Enum.Font.SourceSansBold
+	TextLabel.Text = "Huge"
+	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TextLabel.TextScaled = true
+	TextLabel.TextSize = 14.000
+	TextLabel.TextWrapped = true
+
+	StealButton.Name = "StealButton"
+	StealButton.Parent = line
+	StealButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	StealButton.BackgroundTransparency = 0.500
+	StealButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	StealButton.BorderSizePixel = 0
+	StealButton.Size = UDim2.new(0.25, 0, 1, 0)
+	StealButton.Font = Enum.Font.Ubuntu
+	StealButton.Text = "Steal"
+	StealButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	StealButton.TextScaled = true
+	StealButton.TextSize = 14.000
+	StealButton.TextWrapped = true
+
+	UICorner_3.Parent = StealButton
+
+	UIListLayout_2.Parent = line
+	UIListLayout_2.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout_2.HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly
+	UIListLayout_2.Padding = UDim.new(0, 5)
+
+	GoTo.Name = "GoTo"
+	GoTo.Parent = line
+	GoTo.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	GoTo.BackgroundTransparency = 0.500
+	GoTo.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	GoTo.BorderSizePixel = 0
+	GoTo.Size = UDim2.new(0.25, 0, 1, 0)
+	GoTo.Font = Enum.Font.Ubuntu
+	GoTo.Text = "GoTo"
+	GoTo.TextColor3 = Color3.fromRGB(255, 255, 255)
+	GoTo.TextScaled = true
+	GoTo.TextSize = 14.000
+	GoTo.TextWrapped = true
+
+	UICorner_4.Parent = GoTo
+
+	line.Visible = true
+	line.Name = "PetLine"
+	line.Parent = line.Parent
+	line.TextLabel.Text = pet
+	line.StealButton.Text = "Steal"
+	line.StealButton.Activated:Connect(function()
 		local_player.Character.HumanoidRootPart.CFrame = part.CFrame
 
 		if stealing then
 			stealing = false
-			newHuge.StealButton.Text = "Steal"
+			line.StealButton.Text = "Steal"
 			return
 		end
 
 		stealing = true
-		newHuge.StealButton.Text = "Stop"
+		line.StealButton.Text = "Stop"
 
 		repeat
 			task.wait()
@@ -322,35 +389,42 @@ local function stealPet(pet, part)
 			task.wait()
 			local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
 			stealing = false
-			newHuge.StealButton.Text = "Steal"
+			line.StealButton.Text = "Steal"
 		end
 	end)
 
-	newHuge.GoTo.Text = "ESP"
-	newHuge.GoTo.Activated:Connect(function()
-		if newHuge.GoTo.Text == "ESP" then
+	line.GoTo.Text = "ESP"
+	line.GoTo.Activated:Connect(function()
+		if line.GoTo.Text == "ESP" then
 			local espMark = Instance.new("Highlight")
 			espMark.FillTransparency = 0
 			espMark.FillColor = Color3.new(0.215686, 0.215686, 1)
 			espMark.Parent = part
-			newHuge.GoTo.Text = "unESP"
+			line.GoTo.Text = "unESP"
 		else
 			local espMark = part:FindFirstChildOfClass("Highlight")
 			espMark:Destroy()
-			newHuge.GoTo.Text = "ESP"
+			line.GoTo.Text = "ESP"
 		end
 	end)
 end
 local function loadPets()
-	
-	for _, v in ipairs(Frame:GetDescendants()) do
-		if v.Name == "PetLine" and v:IsA("Frame") then
+
+	for _, v in pairs(ScrollingFrame:GetChildren()) do
+		if v.Name == "PetLine" then
 			v:Destroy()
 		end
 	end
-	
-	for _, v in ipairs(standPets:GetDescendants()) do
+
+	for _, v in ipairs(standPets:GetChildren()) do
+		local rarity = ""
 		local main = v:FindFirstChild("Main")
+		if main and main:FindFirstChild("center"):FindFirstChild("Shiny") then
+			rarity = rarity .. "Shiny "
+		end
+		if main and main:FindFirstChild("actualcenter") and main:FindFirstChild("actualcenter"):FindFirstChild("Specs") then
+			rarity = rarity .. "Golden "
+		end
 		if main and main:FindFirstChild("ParticleEmitter") then
 			stealPet("Egg maybe", main)
 		end
@@ -358,26 +432,26 @@ local function loadPets()
 			petCount += 1
 			local meshId = main:FindFirstChild("Mesh").MeshId
 			if meshId == HugeHellRockMeshId then
-				stealPet("Huge Hell Rock", main)
+				stealPet(rarity.."Huge Hell Rock", main)
 				HugeHellRockCount += 1
 				HugeCount += 1
 			end
 			if meshId == HugePrototypeMeshId then
-				stealPet("Huge M-6 PROTOTYPE", main)
+				stealPet(rarity.."Huge M-6 PROTOTYPE", main)
 			end
 			if meshId == HippomelonMeshId then
-				stealPet("Hippomelon", main)
+				stealPet(rarity.."Hippomelon", main)
 			end
 			if meshId == HugePufferfishMeshId then
-				stealPet("Huge Pufferfish", main)
+				stealPet(rarity.."Huge Pufferfish", main)
 				HugePufferfishCount += 1
 				HugeCount += 1
 			end
 			if main:FindFirstChild("Lid") then
-				stealPet("Toilet Cat", main)
+				stealPet(rarity.."Toilet Cat", main)
 			end
 			if main:FindFirstChild("center"):FindFirstChild("Charge") then
-				stealPet("Corn/Hubert", main)
+				stealPet(rarity.."Corn/Hubert", main)
 			end
 		end
 	end
@@ -385,14 +459,8 @@ end
 
 loadPets()
 
-Players.PlayerAdded:Connect(function()
-	print("reload")
-	loadPets()
-end)
-Players.PlayerRemoving:Connect(function()
-	print("reload")
-	loadPets()
-end)
+standPets.ChildAdded:Connect(loadPets)
+standPets.ChildRemoved:Connect(loadPets)
 
 queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
 
