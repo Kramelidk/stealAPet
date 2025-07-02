@@ -159,6 +159,10 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
+local petLineTemplate = line:Clone()
+petLineTemplate.Name = "PetLineTemplate"
+petLineTemplate.Parent = nil
+
 local proximityprompt_service = game:GetService("ProximityPromptService")
 local local_player = game:GetService("Players").LocalPlayer
 local workspace = game:GetService("Workspace")
@@ -258,23 +262,80 @@ newbutton1.Name = "newbutton1"
 newbutton1.Text = "s/hop"
 newbutton1.Parent = line.StealButton.Parent
 newbutton1.Activated:Connect(function()
-	local servers = {}
-	local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
-	local body = HttpService:JSONDecode(req)
-
-	if body and body.data then
-		for i, v in next, body.data do
-			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
-				table.insert(servers, 1, v.id)
+	--[[
+		WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+	]]
+	local PlaceID = game.PlaceId
+	local AllIDs = {}
+	local foundAnything = ""
+	local actualHour = os.date("!*t").hour
+	local Deleted = false
+	local File = pcall(function()
+		AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
+	end)
+	if not File then
+		table.insert(AllIDs, actualHour)
+		writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+	end
+	function TPReturner()
+		local Site;
+		if foundAnything == "" then
+			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+		else
+			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+		end
+		local ID = ""
+		if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+			foundAnything = Site.nextPageCursor
+		end
+		local num = 0;
+		for i,v in pairs(Site.data) do
+			local Possible = true
+			ID = tostring(v.id)
+			if tonumber(v.maxPlayers) > tonumber(v.playing) then
+				for _,Existing in pairs(AllIDs) do
+					if num ~= 0 then
+						if ID == tostring(Existing) then
+							Possible = false
+						end
+					else
+						if tonumber(actualHour) ~= tonumber(Existing) then
+							local delFile = pcall(function()
+								delfile("NotSameServers.json")
+								AllIDs = {}
+								table.insert(AllIDs, actualHour)
+							end)
+						end
+					end
+					num = num + 1
+				end
+				if Possible == true then
+					table.insert(AllIDs, ID)
+					wait()
+					pcall(function()
+						writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+						wait()
+						game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+					end)
+					wait(4)
+				end
 			end
 		end
 	end
 
-	if #servers > 0 then
-		TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], local_player)
-	else
-		warn("couldn't find server")
+	function Teleport()
+		while wait() do
+			pcall(function()
+				TPReturner()
+				if foundAnything ~= "" then
+					TPReturner()
+				end
+			end)
+		end
 	end
+
+	-- If you'd like to use a script before server hopping (Like a Automatic Chest collector you can put the Teleport() after it collected everything.
+	Teleport()
 end)
 
 local newbutton2 = line.StealButton:Clone()
@@ -288,77 +349,10 @@ end)
 
 local stealing = false
 local function stealPet(pet, part)
-	local line = Instance.new("Frame")
-	local TextLabel = Instance.new("TextLabel")
-	local StealButton = Instance.new("TextButton")
-	local UICorner_3 = Instance.new("UICorner")
-	local UIListLayout_2 = Instance.new("UIListLayout")
-	local GoTo = Instance.new("TextButton")
-	local UICorner_4 = Instance.new("UICorner")
-
-	line.Name = "PetLine"
+	local line = petLineTemplate:Clone()
 	line.Parent = ScrollingFrame
-	line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	line.BackgroundTransparency = 1.000
-	line.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	line.BorderSizePixel = 0
-	line.Size = UDim2.new(1, 0, 0.025, 0)
-
-	TextLabel.Parent = line
-	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel.BackgroundTransparency = 1.000
-	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TextLabel.BorderSizePixel = 0
-	TextLabel.Size = UDim2.new(0.400000006, 0, 1, 0)
-	TextLabel.Font = Enum.Font.SourceSansBold
-	TextLabel.Text = "Huge"
-	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel.TextScaled = true
-	TextLabel.TextSize = 14.000
-	TextLabel.TextWrapped = true
-
-	StealButton.Name = "StealButton"
-	StealButton.Parent = line
-	StealButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	StealButton.BackgroundTransparency = 0.500
-	StealButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	StealButton.BorderSizePixel = 0
-	StealButton.Size = UDim2.new(0.25, 0, 1, 0)
-	StealButton.Font = Enum.Font.Ubuntu
-	StealButton.Text = "Steal"
-	StealButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	StealButton.TextScaled = true
-	StealButton.TextSize = 14.000
-	StealButton.TextWrapped = true
-
-	UICorner_3.Parent = StealButton
-
-	UIListLayout_2.Parent = line
-	UIListLayout_2.FillDirection = Enum.FillDirection.Horizontal
-	UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	UIListLayout_2.HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly
-	UIListLayout_2.Padding = UDim.new(0, 5)
-
-	GoTo.Name = "GoTo"
-	GoTo.Parent = line
-	GoTo.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	GoTo.BackgroundTransparency = 0.500
-	GoTo.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	GoTo.BorderSizePixel = 0
-	GoTo.Size = UDim2.new(0.25, 0, 1, 0)
-	GoTo.Font = Enum.Font.Ubuntu
-	GoTo.Text = "GoTo"
-	GoTo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	GoTo.TextScaled = true
-	GoTo.TextSize = 14.000
-	GoTo.TextWrapped = true
-
-	UICorner_4.Parent = GoTo
-
 	line.Visible = true
 	line.Name = "PetLine"
-	line.Parent = line.Parent
 	line.TextLabel.Text = pet
 	line.StealButton.Text = "Steal"
 	line.StealButton.Activated:Connect(function()
@@ -374,7 +368,7 @@ local function stealPet(pet, part)
 		line.StealButton.Text = "Stop"
 
 		repeat
-			task.wait()
+			wait()
 			local_player.Character.HumanoidRootPart.CFrame = part.CFrame
 		until part.Parent:FindFirstChild("RootPart"):FindFirstChild("ProximityPrompt").Enabled or not stealing
 
@@ -410,43 +404,60 @@ local function stealPet(pet, part)
 	end)
 end
 
-local function isPetNearStand(petPart, standFolder, maxDistance)
-	for _, stand in pairs(standFolder:GetDescendants()) do
-		if stand:IsA("BasePart") and stand.Name == "Holder" then
-			local distance = (petPart.Position - stand.Position).Magnitude
-			if distance <= maxDistance then
-				return true, stand
-			end
-		end
+local function isPetNearBase(petPart, basePart)
+	local baseSize = basePart.Size
+	local basePos = basePart.Position
+	local petPos = petPart.Position
+
+	-- Check if pet X/Z is within base X/Z bounds
+	local halfSize = baseSize / 2
+	local withinX = petPos.X >= (basePos.X - halfSize.X) and petPos.X <= (basePos.X + halfSize.X)
+	local withinZ = petPos.Z >= (basePos.Z - halfSize.Z) and petPos.Z <= (basePos.Z + halfSize.Z)
+
+	local above = petPos.Y >= basePos.Y
+
+	if withinX and withinZ and above then
+		return true
 	end
-	return false, nil
+	return false
 end
 
 local function loadPets()
-
+	-- Clear UI
 	for _, v in pairs(ScrollingFrame:GetChildren()) do
 		if v.Name == "PetLine" then
 			v:Destroy()
 		end
 	end
 
+	local basePart = plot:FindFirstChild("Base")
+	if not basePart then return end
+
 	for _, v in ipairs(standPets:GetChildren()) do
 		local main = v:FindFirstChild("Main")
-		if main then
-			if isPetNearStand(main, plot:FindFirstChild("Stands"), 15) then
-				print("ur pet found")
-				continue
-			end
+		if not main then continue end
+
+		local isOwnPet = isPetNearBase(main, basePart)
+		if isOwnPet then
+			print("ur pet found")
+			continue
 		end
-		if main and main:FindFirstChild("ParticleEmitter") then
+
+		local emitter = main:FindFirstChild("ParticleEmitter")
+		if emitter then
 			stealPet("Egg maybe", main)
 			continue
 		end
-		if main and main:FindFirstChild("Mesh") then
+
+		local mesh = main:FindFirstChild("Mesh")
+		if mesh then
 			petCount += 1
-			local meshId = main:FindFirstChild("Mesh").MeshId
+			local meshId = mesh.MeshId
+
 			if meshId == HugeHellRockMeshId then
 				stealPet("Huge Hell Rock", main)
+				HugeHellRockCount += 1
+				HugeCount += 1
 				continue
 			end
 			if meshId == HugePrototypeMeshId then
@@ -459,14 +470,8 @@ local function loadPets()
 			end
 			if meshId == HugePufferfishMeshId then
 				stealPet("Huge Pufferfish", main)
-				continue
-			end
-			if main:FindFirstChild("Lid") then
-				stealPet("Toilet Cat", main)
-				continue
-			end
-			if main:FindFirstChild("center"):FindFirstChild("Charge") then
-				stealPet("Corn/Hubert", main)
+				HugePufferfishCount += 1
+				HugeCount += 1
 				continue
 			end
 			if meshId == BlackHoleAngelusMeshId then
@@ -474,13 +479,37 @@ local function loadPets()
 				continue
 			end
 		end
+
+		if main:FindFirstChild("Lid") then
+			stealPet("Toilet Cat", main)
+			continue
+		end
+
+		local center = main:FindFirstChild("center")
+		if center and center:FindFirstChild("Charge") then
+			stealPet("Corn/Hubert", main)
+			continue
+		end
 	end
 end
+
 
 loadPets()
 
 standPets.ChildAdded:Connect(loadPets)
 standPets.ChildRemoved:Connect(loadPets)
+
+local rateText = plot:FindFirstChild("LockButton"):FindFirstChild("Billboard"):FindFirstChild("Frame"):FindFirstChild("Rate")
+local lockTouchInterest = plot:FindFirstChild("LockButton")
+local hrp = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+RunService.Heartbeat:Connect(function()
+	if rateText.Text == "" then
+		firetouchinterest(hrp, lockTouchInterest, 0)
+		task.wait()
+		firetouchinterest(hrp, lockTouchInterest, 1)
+	end
+end)
 
 queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
 
