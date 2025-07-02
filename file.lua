@@ -409,6 +409,19 @@ local function stealPet(pet, part)
 		end
 	end)
 end
+
+local function isPetNearStand(petPart, standFolder, maxDistance)
+	for _, stand in pairs(standFolder:GetDescendants()) do
+		if stand:IsA("BasePart") and stand.Name == "Holder" then
+			local distance = (petPart.Position - stand.Position).Magnitude
+			if distance <= maxDistance then
+				return true, stand
+			end
+		end
+	end
+	return false, nil
+end
+
 local function loadPets()
 
 	for _, v in pairs(ScrollingFrame:GetChildren()) do
@@ -419,36 +432,46 @@ local function loadPets()
 
 	for _, v in ipairs(standPets:GetChildren()) do
 		local main = v:FindFirstChild("Main")
+		if main then
+			if isPetNearStand(main, plot:FindFirstChild("Stands"), 15) then
+				print("ur pet found")
+				continue
+			end
+		end
 		if main and main:FindFirstChild("ParticleEmitter") then
 			stealPet("Egg maybe", main)
+			continue
 		end
 		if main and main:FindFirstChild("Mesh") then
 			petCount += 1
 			local meshId = main:FindFirstChild("Mesh").MeshId
 			if meshId == HugeHellRockMeshId then
 				stealPet("Huge Hell Rock", main)
-				HugeHellRockCount += 1
-				HugeCount += 1
+				continue
 			end
 			if meshId == HugePrototypeMeshId then
 				stealPet("Huge M-6 PROTOTYPE", main)
+				continue
 			end
 			if meshId == HippomelonMeshId then
 				stealPet("Hippomelon", main)
+				continue
 			end
 			if meshId == HugePufferfishMeshId then
 				stealPet("Huge Pufferfish", main)
-				HugePufferfishCount += 1
-				HugeCount += 1
+				continue
 			end
 			if main:FindFirstChild("Lid") then
 				stealPet("Toilet Cat", main)
+				continue
 			end
 			if main:FindFirstChild("center"):FindFirstChild("Charge") then
 				stealPet("Corn/Hubert", main)
+				continue
 			end
 			if meshId == BlackHoleAngelusMeshId then
 				stealPet("Huge Black Hole Anus", main)
+				continue
 			end
 		end
 	end
