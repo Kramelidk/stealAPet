@@ -248,18 +248,42 @@ proximityprompt_service.PromptButtonHoldEnded:Connect(function()
 	local_player.Character:MoveTo(plot:FindFirstChild("CollectPart"):GetPivot().Position)
 end)
 
-line.Visible = false
+line.Visible = true
+line.TextLabel:Destroy()
+line.StealButton.Size = UDim2.new(0.2, 0, 1, 0)
+line.GoTo.Size = UDim2.new(0.2, 0, 1, 0)
+local newbutton1 = line.StealButton:Clone()
+newbutton1.Name = "newbutton1"
+newbutton1.Text = "s/hop"
+newbutton1.Parent = line.StealButton.Parent
+newbutton1.Activated:Connect(function()
+	local servers = {}
+	local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+	local body = HttpService:JSONDecode(req)
 
-local newLine = line:Clone()
-newLine.Visible = true
-newLine.Parent = line.Parent
-newLine.TextLabel:Destroy()
-newLine.StealButton.Size = UDim2.new(0.2, 0, 1, 0)
-newLine.GoTo.Size = UDim2.new(0.2, 0, 1, 0)
-local newbutton1 = newLine.StealButton:Clone()
-newbutton1.Parent = newLine.StealButton.Parent
-local newbutton2 = newLine.StealButton:Clone()
-newbutton2.Parent = newLine.StealButton.Parent
+	if body and body.data then
+		for i, v in next, body.data do
+			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+				table.insert(servers, 1, v.id)
+			end
+		end
+	end
+
+	if #servers > 0 then
+		TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], local_player)
+	else
+		warn("couldn't find server")
+	end
+end)
+
+local newbutton2 = line.StealButton:Clone()
+newbutton2.Name = "newbutton2"
+newbutton2.Text = "LockBase"
+newbutton2.Parent = line.StealButton.Parent
+newbutton2.Activated:Connect(function()
+	local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0, 2, 0)
+end)
+
 
 local stealing = false
 local function stealPet(pet, part)
@@ -368,33 +392,6 @@ end)
 Players.PlayerRemoving:Connect(function()
 	print("reload")
 	loadPets()
-end)
-
-newbutton1.Text = "s/hop"
-newbutton1.Activated:Connect(function()
-	-- thanks to Amity for fixing
-	local servers = {}
-	local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
-	local body = HttpService:JSONDecode(req)
-
-	if body and body.data then
-		for i, v in next, body.data do
-			if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
-				table.insert(servers, 1, v.id)
-			end
-		end
-	end
-
-	if #servers > 0 then
-		TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], local_player)
-	else
-		warn("couldn't find server")
-	end
-end)
-
-newbutton2.Text = "LockBase"
-newbutton2.Activated:Connect(function()
-	local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
 end)
 
 queueonteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Kramelidk/stealAPet/refs/heads/main/file.lua'))()")
