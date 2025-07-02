@@ -218,6 +218,7 @@ local HugePufferfishMeshId = "rbxassetid://13811398935"
 local HugePufferfishCount = 0
 local HugePrototypeMeshId = "rbxassetid://7487208023"
 local HippomelonMeshId = 'rbxassetid://7102446118'
+local BlackHoleAngelusMeshId = "rbxassetid://17275906131"
 
 local HugeCount = 0
 
@@ -417,14 +418,7 @@ local function loadPets()
 	end
 
 	for _, v in ipairs(standPets:GetChildren()) do
-		local rarity = ""
 		local main = v:FindFirstChild("Main")
-		if main and main:FindFirstChild("center"):FindFirstChild("Shiny") then
-			rarity = rarity .. "Shiny "
-		end
-		if main and main:FindFirstChild("actualcenter") and main:FindFirstChild("actualcenter"):FindFirstChild("Specs") then
-			rarity = rarity .. "Golden "
-		end
 		if main and main:FindFirstChild("ParticleEmitter") then
 			stealPet("Egg maybe", main)
 		end
@@ -432,26 +426,29 @@ local function loadPets()
 			petCount += 1
 			local meshId = main:FindFirstChild("Mesh").MeshId
 			if meshId == HugeHellRockMeshId then
-				stealPet(rarity.."Huge Hell Rock", main)
+				stealPet("Huge Hell Rock", main)
 				HugeHellRockCount += 1
 				HugeCount += 1
 			end
 			if meshId == HugePrototypeMeshId then
-				stealPet(rarity.."Huge M-6 PROTOTYPE", main)
+				stealPet("Huge M-6 PROTOTYPE", main)
 			end
 			if meshId == HippomelonMeshId then
-				stealPet(rarity.."Hippomelon", main)
+				stealPet("Hippomelon", main)
 			end
 			if meshId == HugePufferfishMeshId then
-				stealPet(rarity.."Huge Pufferfish", main)
+				stealPet("Huge Pufferfish", main)
 				HugePufferfishCount += 1
 				HugeCount += 1
 			end
 			if main:FindFirstChild("Lid") then
-				stealPet(rarity.."Toilet Cat", main)
+				stealPet("Toilet Cat", main)
 			end
 			if main:FindFirstChild("center"):FindFirstChild("Charge") then
-				stealPet(rarity.."Corn/Hubert", main)
+				stealPet("Corn/Hubert", main)
+			end
+			if meshId == BlackHoleAngelusMeshId then
+				stealPet("Huge Black Hole Anus", main)
 			end
 		end
 	end
