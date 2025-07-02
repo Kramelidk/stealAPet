@@ -282,7 +282,7 @@ newbutton2.Name = "newbutton2"
 newbutton2.Text = "LockBase"
 newbutton2.Parent = line.StealButton.Parent
 newbutton2.Activated:Connect(function()
-	local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0, 2, 0)
+	local_player.Character.HumanoidRootPart.CFrame = CFrame.new(plot:FindFirstChild("LockButton").CFrame.Position.X, 5, plot:FindFirstChild("LockButton").CFrame.Position.Z)
 end)
 
 
@@ -388,7 +388,7 @@ local function stealPet(pet, part)
 			task.wait()
 			local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("CollectPart").CFrame * CFrame.new(0,2,0)
 			task.wait()
-			local_player.Character.HumanoidRootPart.CFrame = plot:FindFirstChild("LockButton").CFrame * CFrame.new(0,2,0)
+			local_player.Character.HumanoidRootPart.CFrame = CFrame.new(plot:FindFirstChild("LockButton").CFrame.Position.X, 5, plot:FindFirstChild("LockButton").CFrame.Position.Z)
 			stealing = false
 			line.StealButton.Text = "Steal"
 		end
